@@ -142,3 +142,9 @@ getContainerLogs :: DockerClientOpts -> String -> IO (L.ByteString)
 getContainerLogs  clientOpts containerId = (^. responseBody) <$> _dockerGetQuery url clientOpts
         where url = (printf "/containers/%s/logs?stdout=1&stderr=1" containerId)
 
+-- Written based on v1.17 of Docker API.
+inspectContainer :: DockerClientOpts -> String -> IO (Maybe ContainerInformation)
+inspectContainer clientOpts containerId = decodeResponse $ _dockerGetQuery req clientOpts
+    where
+        req = printf "/containers/%s/json" containerId
+

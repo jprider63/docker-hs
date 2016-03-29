@@ -180,7 +180,7 @@ data StartContainerOpts = StartContainerOpts
                         , _Privileged      :: Bool
                         , _Dns             :: [T.Text]
                         , _VolumesFrom     :: [T.Text]
-			, _RestartPolicy   :: RestartPolicy
+                        , _RestartPolicy   :: RestartPolicy
                         } deriving (Show)
 
 defaultStartOpts = StartContainerOpts
@@ -205,7 +205,7 @@ instance ToJSON StartContainerOpts where
             , "Privileged" .= _Privileged
             , "Dns" .= _Dns
             , "VolumesFrom" .= _VolumesFrom
-	    , "RestartPolicy" .= _RestartPolicy
+            , "RestartPolicy" .= _RestartPolicy
             ]
 
 data RestartPolicy = RestartNever
@@ -263,4 +263,36 @@ instance FromJSON DockerContainer where
 --                 <*> (v .:? "warnings")
 
 $(deriveJSON dopts ''DockerVersion)
+
+-- Based on v1.17 of Docker API.
+-- https://docs.docker.com/engine/reference/api/docker_remote_api_v1.17/#create-a-container
+data ContainerInformation = ContainerInformation {
+      containerInformationNetworkSettings :: ContainerNetworkSettings
+    -- TODO: There are a bunch more. XXX
+    }
+
+instance FromJSON ContainerInformation where
+    parseJSON (Object o) = do
+        networkSettings <- o .: "NetworkSettings"
+        return $ ContainerInformation networkSettings
+    
+data ContainerNetworkSettings = ContainerNetworkSettings {
+      containerNetworkSettingsBridge :: T.Text
+    , containerNetworkSettingsGateway :: T.Text
+    , containerNetworkSettingsIPAddress :: T.Text
+    , containerNetworkSettingsIPPrefixLen :: Int
+    , containerNetworkSettingsMacAddress :: T.Text
+    -- , containerNetworkSettingsPortMapping :: Not sure about this type. API is ambiguous
+    , containerNetworkSettingsPorts :: Maybe [Int] -- API is also ambigous here.
+    }
+
+instance FromJSON ContainerNetworkSettings where
+    parseJSON (Object o) = do
+        bridge <- o .: "Bridge"
+        gateway <- o .: "Gateway"
+        ipAddress <- o .: "IPAddress"
+        ipPrefixLen <- o .: "IPPrefixLen"
+        macAddress <- o .: "MacAddress"
+        ports <- o .: "SettingsPorts"
+        return $ ContainerNetworkSettings bridge gateway ipAddress ipPrefixLen macAddress ports
 

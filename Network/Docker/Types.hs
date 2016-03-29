@@ -33,8 +33,8 @@ type PortType = String
 data SSL = NoSSL | SSL SSLOptions deriving Show
 
 data DockerClientOpts = DockerClientOpts {
-      apiVersion :: ApiVersion
-    , baseUrl    :: URL
+      apiVersion :: ApiVersion -- ^ It appears that the latest supported version is 1.17. Ex: `"v1.12"`
+    , baseUrl    :: URL -- ^ Ex: `"http://127.0.0.1:3128/"`
     , ssl        :: SSL
     } deriving (Show)
 
@@ -101,6 +101,7 @@ data CreateContainerOpts = CreateContainerOpts
                   , _user           :: String
                   , _memory         :: Int
                   , _memorySwap     :: Int
+                  , _cpuShares      :: Int
                   , _attachStdin    :: Bool
                   , _attachStdout   :: Bool
                   , _attachStderr   :: Bool
@@ -123,6 +124,7 @@ defaultCreateOpts = CreateContainerOpts {
                             , _user = ""
                             , _memory = 0
                             , _memorySwap =  0
+                            , _cpuShares = 0
                             , _attachStdin = False
                             , _attachStdout = False
                             , _attachStderr = False
@@ -146,6 +148,7 @@ instance ToJSON CreateContainerOpts where
             , "User" .= _user
             , "Memory" .= _memory
             , "MemorySwap" .= _memorySwap
+            , "CpuShares" .= _cpuShares
             , "AttachStdin" .= _attachStdin
             , "AttachStdout" .= _attachStdout
             , "AttachStderr" .= _attachStderr

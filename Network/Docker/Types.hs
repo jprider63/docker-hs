@@ -161,7 +161,7 @@ instance ToJSON CreateContainerOpts where
             , "Image" .= _image
             , "Volumes" .= _volumes
             , "VolumesFrom" .= _volumesFrom
-            , "WrokingDir" .= _workingDir
+            , "WorkingDir" .= _workingDir
             , "DisableNetwork" .= _disableNetwork
             , "ExposedPorts" .= _exposedPorts
             ]

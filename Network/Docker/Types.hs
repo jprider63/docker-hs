@@ -283,7 +283,7 @@ data ContainerNetworkSettings = ContainerNetworkSettings {
     , containerNetworkSettingsIPPrefixLen :: Int
     , containerNetworkSettingsMacAddress :: T.Text
     -- , containerNetworkSettingsPortMapping :: Not sure about this type. API is ambiguous
-    , containerNetworkSettingsPorts :: Maybe [Int] -- API is also ambigous here.
+    , containerNetworkSettingsPorts :: [Int] -- API is also ambigous here.
     }
 
 instance FromJSON ContainerNetworkSettings where
@@ -293,6 +293,6 @@ instance FromJSON ContainerNetworkSettings where
         ipAddress <- o .: "IPAddress"
         ipPrefixLen <- o .: "IPPrefixLen"
         macAddress <- o .: "MacAddress"
-        ports <- o .: "SettingsPorts"
+        ports <- o .:? "SettingsPorts" .!= []
         return $ ContainerNetworkSettings bridge gateway ipAddress ipPrefixLen macAddress ports
 

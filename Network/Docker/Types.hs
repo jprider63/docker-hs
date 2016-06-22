@@ -42,6 +42,7 @@ data DockerClientOpts = DockerClientOpts {
 data SSLOptions = SSLOptions {
     optionsKey  :: FilePath
   , optionsCert :: FilePath
+  , optionsCACert :: Maybe FilePath -- ^ Optional filepath of the CA's certificate.
   } deriving Show
 
 

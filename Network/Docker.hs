@@ -46,13 +46,17 @@ fullUrl :: DockerClientOpts -> Endpoint -> URL
 fullUrl clientOpts endpoint = constructUrl (baseUrl clientOpts) (apiVersion clientOpts) endpoint
 
 setupSSLCtx :: SSLOptions -> IO SSLContext
-setupSSLCtx (SSLOptions key cert) = do
+setupSSLCtx (SSLOptions key cert caCertM) = do
   ctx <- SSL.context
   SSL.contextSetPrivateKeyFile  ctx key
   SSL.contextSetCertificateFile ctx cert
+  whenJust caCertM $ SSL.contextSetCAFile ctx
   SSL.contextAddOption ctx SSL.SSL_OP_NO_SSLv3
   SSL.contextAddOption ctx SSL.SSL_OP_NO_SSLv2
   return ctx
+
+  where
+    whenJust m f = maybe (return ()) f m
 
 
 mkOpts c = defaults & manager .~ Left (opensslManagerSettings c)
